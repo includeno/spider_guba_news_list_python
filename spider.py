@@ -74,7 +74,7 @@ def get_table(stock,max_page=1):
     
     merged_csv_file_path=""
     for page in range(1,page_count):
-        if(max_page!=None and page>max_page):
+        if(max_page is not None and page>max_page):
             break
         url=get_list_url_by_page(stock,page)
         result=[]
@@ -83,6 +83,9 @@ def get_table(stock,max_page=1):
         # 读取文件
         with open(html_file, 'r', encoding='utf-8') as f:
             html = f.read()
+        if(html==""):
+            print("html is empty",flush=True)
+            continue
         js=parse_html_js_data(html)
         write_json_data(js,f"{stock}_{page}.json")
         for item in js["re"]:
@@ -102,4 +105,5 @@ def get_table(stock,max_page=1):
     return merged_csv_file_path
 
 if __name__ == "__main__":
-    get_table("usmsft",max_page=2)
+    merged_csv_file_path=get_table("usmsft",max_page=2)
+    print("merged_csv_file_path:",merged_csv_file_path)
