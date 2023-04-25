@@ -65,15 +65,19 @@ def get_table(stock,max_page=1):
     with open(temp, 'r', encoding='utf-8') as f:
         html = f.read()
     js=parse_html_js_data(html)
-    print("count:",js["count"])
-    print("StockCode:",js["bar_info"]["StockCode"])
     print("bar_name:",js["bar_name"])
     count=js["count"]
-    page_count=int(count/80+0.5)
+    page_count=(count + 79) // 80
+    print("page_count:",page_count)
+    print("count:",count)
+    print("StockCode:",js["bar_info"]["StockCode"])
+    print("bar_name:",js["bar_name"])
     stock_code=js["bar_info"]["StockCode"]
+    print("stock_code:",stock_code)
     
     merged_csv_file_path=""
-    for page in range(1,page_count):
+    result_list=[]
+    for page in range(1,page_count+1):
         if(max_page is not None and page>max_page):
             break
         url=get_list_url_by_page(stock,page)
@@ -90,7 +94,7 @@ def get_table(stock,max_page=1):
         write_json_data(js,f"{stock}_{page}.json")
         for item in js["re"]:
             # json 格式转化为dict
-            result.append({
+            data={
                 "title":item["post_title"],
                 "id":item["post_id"],
                 "username":item["user_nickname"],
@@ -99,11 +103,14 @@ def get_table(stock,max_page=1):
                 "time":item["post_publish_time"],
                 "stock_code":stock_code,
                 "stockbar_name":item["stockbar_name"]
-                })
+                }
+            result.append(data)
+            result_list.append(data)
         page_csv_file_path=write_page_csv_data(result,stock=stock,page=page)
-        merged_csv_file_path=write_merged_csv_data(result,stock=stock)
+        merged_csv_file_path=write_merged_csv_data(result_list,stock=stock)
     return merged_csv_file_path
 
 if __name__ == "__main__":
     merged_csv_file_path=get_table("usmsft",max_page=2)
+    #merged_csv_file_path=get_table("usdjia",max_page=2)
     print("merged_csv_file_path:",merged_csv_file_path)
