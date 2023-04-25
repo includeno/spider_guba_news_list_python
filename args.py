@@ -29,6 +29,6 @@ args = parser.parse_args()
 with open('DATE', 'w') as f:
     f.write(f'DATE={today()}\n')
 
-file_path,list=get_table(args.stock,args.max_page)
+file_path=get_table(args.stock,args.max_page)
 
 send_email(args.sender,args.ps,args.recipient,args.smtp_server,args.port,subject='GuBa News',attachment_path=file_path)
