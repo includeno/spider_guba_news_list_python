@@ -23,8 +23,8 @@ def write_html(url,driver=None,html_file="html.txt"):
         print("driver does not exist",flush=True)
         raise Exception("system driver error")
     # 设置最大等待时间为10秒
-    driver.implicitly_wait(10)
-    driver.set_page_load_timeout(15)
+    driver.implicitly_wait(20)
+    driver.set_page_load_timeout(30)
     driver.get(url)
     html = ""
     try:
