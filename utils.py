@@ -41,7 +41,7 @@ def write_merged_csv_data(result_list,stock):
     merged_csv_file_path=os.path.join(csv_folder_path,merged_csv_file)
     try:
         csv_df=pd.read_csv(merged_csv_file_path,encoding='utf-8')
-        csv_df.merge(df)
+        csv_df=pd.concat([csv_df,df],ignore_index=True)
         csv_df.drop_duplicates(subset=['id'],keep='last',inplace=True)
         csv_df.to_csv(merged_csv_file_path)
         print(f"csv stock:{stock} 合并成功",flush=True)

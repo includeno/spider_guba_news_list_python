@@ -26,7 +26,6 @@ def write_html(url,driver=None,html_file="html.txt"):
     driver.implicitly_wait(10)
     driver.set_page_load_timeout(15)
     driver.get(url)
-    time.sleep(2)
     html = ""
     try:
         driver.get(url)
@@ -41,6 +40,7 @@ def write_html(url,driver=None,html_file="html.txt"):
     # 页面源代码写入文件
     with open(html_file, 'w', encoding='utf-8') as f:
         f.write(html)
+    time.sleep(4)
     return html_file
 
 # 测试通过
@@ -107,10 +107,29 @@ def get_table(stock,max_page=1):
     
     merged_csv_file_path=""
     result_list=[]
+    error_pages=[]
     for page in range(1,page_count+1):
         if(max_page is not None and page>max_page):
             break
-        result=crawl_stock_list_by_page(stock,page,stock_code)
+        result=[]
+        try:
+            result=crawl_stock_list_by_page(stock,page,stock_code)
+        except Exception as e:
+            print("crawl_stock_list_by_page error",e,flush=True)
+            error_pages.append(page)
+            time.sleep(10)
+            continue
+        for data in result:
+            result_list.append(data)
+        merged_csv_file_path=write_merged_csv_data(result_list,stock=stock)
+    for page in error_pages:
+        if(max_page is not None and page>max_page):
+            break
+        result=[]
+        try:
+            result=crawl_stock_list_by_page(stock,page,stock_code)
+        except Exception as e:
+            print("crawl_stock_list_by_page error_pages!",e,flush=True)
         for data in result:
             result_list.append(data)
         merged_csv_file_path=write_merged_csv_data(result_list,stock=stock)
