@@ -5,12 +5,15 @@ import pandas as pd
 # 要创建的文件夹路径
 json_folder_path = "json"
 csv_folder_path = "csv"
+divs_folder_path = "divs"
 
 # 如果文件夹不存在，则创建文件夹
 if not os.path.exists(json_folder_path):
     os.makedirs(json_folder_path)
 if not os.path.exists(csv_folder_path):
     os.makedirs(csv_folder_path)
+if not os.path.exists(divs_folder_path):
+    os.makedirs(divs_folder_path)
 
 def write_json(json_str,filename="data.json"):
     # 将JSON格式字符串解析为Python对象
