@@ -5,6 +5,9 @@ import concurrent.futures
 from concurrent.futures import ThreadPoolExecutor
 from spider import parse_html_js_data
 from utils import write_json_data,write_page_csv_data,write_merged_csv_data,write_page_info_csv_data
+from logging import getLogger
+
+logger=getLogger("test_requests")
 
 # html = ""
 # url = "http://guba.eastmoney.com/list,usaapl_1.html"
@@ -20,10 +23,11 @@ def save_response(stock):
         filename = os.path.join("responses", f"response_{stock}.html")
         with open(filename, 'w') as f:
             f.write(response.text)
-        print(f"Saved {url} to {filename}")
+        print(f"Saved {url} to {filename}",flush=True)
     else:
-        print(f"Failed to fetch {url}")
+        print(f"Failed to fetch {url}",flush=True)
     time.sleep(4)
+    logger.info(f"Saved {url} to {filename}")
 
 def main(stocks):
     #stocks=["usaapl","usamzn","usnflx","usgoog","usfb"]
@@ -36,7 +40,7 @@ def main(stocks):
         for future in concurrent.futures.as_completed(futures):
             try:
                 result = future.result()
-                print(result)
+                print(f"result:{result}",flush=True)
             except Exception as e:
                 print(f"An error occurred: {e}")
     
