@@ -31,8 +31,14 @@ with open('DATE', 'w') as f:
     f.write(f'DATE={today()}\n')
 
 from test_requests import main
-df=pd.read_csv(f'divs/stocks_{args.stock}.csv')
-stocks=df['name_en'].tolist()
+stocks_df=pd.read_csv(f'divs/stocks_{args.stock}.csv')
+# 定义添加前缀和小写化的函数
+def add_prefix_and_lowercase(text, prefix):
+    return prefix + text.lower()
+prefix = 'us'
+# 为某列添加前缀并将原文本小写化
+stocks_df['name_en'] = stocks_df['name_en'].apply(lambda x: add_prefix_and_lowercase(x, prefix))
+stocks=stocks_df['name_en'].tolist()
 page_info_csv_file_path=main(stocks)
 #file_path=get_table(args.stock,args.max_page)
 
