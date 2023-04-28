@@ -180,10 +180,14 @@ def get_table(stock,max_page=1,page_count=None,stock_code=None):
 
 def get_page_info(stock):
     print("get_page_info:",stock,flush=True)
-    count,page_count,stock_code=get_table_info(stock)
-    print("stock:",stock,"count:",count,"page_count:",page_count,"stock_code:",stock_code)
-    write_page_info_csv_data(stock,page_count,count)
-    return count,page_count,stock_code
+    try:
+        count,page_count,stock_code=get_table_info(stock)
+        print("stock:",stock,"count:",count,"page_count:",page_count,"stock_code:",stock_code)
+        write_page_info_csv_data(stock,page_count,count)
+        return count,page_count,stock_code
+    except Exception as e:
+        print("get_page_info error:",e,flush=True)
+        return -1,-1,stock
 
 if __name__ == "__main__":
     print()

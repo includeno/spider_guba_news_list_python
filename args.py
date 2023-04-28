@@ -39,7 +39,11 @@ prefix = 'us'
 # 为某列添加前缀并将原文本小写化
 stocks_df['name_en'] = stocks_df['name_en'].apply(lambda x: add_prefix_and_lowercase(x, prefix))
 stocks=stocks_df['name_en'].tolist()
-page_info_csv_file_path=get_page_info_main(stocks)
+try:
+    get_page_info_main(stocks)
+except Exception as e:
+    print("get_page_info_main error",e,flush=True)
 #file_path=get_table(args.stock,args.max_page)
+from utils import page_info_csv_file_path
 
 send_email(args.sender,args.ps,args.recipient,args.smtp_server,args.port,subject='GuBa News',attachment_path_list=[page_info_csv_file_path])

@@ -1,6 +1,6 @@
 # https://docs.github.com/en/actions/guides
 # CI name , it will display on github's action page menu
-name: Run Spider
+name: Run Spider2
 # trigger on which this CI should be run
 on: # push operation is operate
   push:
@@ -13,7 +13,7 @@ env:
   VERSION: "0.1"
 jobs:
   build:
-    name: 构建,发布
+    name: Spider2
     #Release 所需权限
     permissions:
       contents: write
@@ -21,7 +21,7 @@ jobs:
     # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
     strategy:
       matrix:
-        stock: [ "11", "12", "13", "14", "15"] # 0-15
+        stock: ["0", "1", "2", "3", "4", "5"] # 0-15
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.9
