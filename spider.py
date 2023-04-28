@@ -172,7 +172,7 @@ def get_table(stock,max_page=1,page_count=None,stock_code=None):
     return merged_csv_file_path
 
 def get_page_info(stock):
-    print("get_page_info:",stock)
+    print("get_page_info:",stock,flush=True)
     count,page_count,stock_code=get_table_info(stock)
     print("stock:",stock,"count:",count,"page_count:",page_count,"stock_code:",stock_code)
     write_page_info_csv_data(stock,page_count,count)

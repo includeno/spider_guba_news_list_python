@@ -54,11 +54,11 @@ def write_merged_csv_data(result_list,stock):
         print(f"csv stock:{stock} 新建成功",flush=True)
     return merged_csv_file_path
 
+page_info_csv_file=f"page_info.csv"
+page_info_csv_file_path=os.path.join(csv_folder_path,page_info_csv_file)
 def write_page_info_csv_data(stock,page_count,count):
     df = pd.DataFrame([{"stock":stock,"page_count":page_count,"count":count}])
     # 写入page的csv文件
-    page_info_csv_file=f"page_info.csv"
-    page_info_csv_file_path=os.path.join(csv_folder_path,page_info_csv_file)
     try:
         csv_df=pd.read_csv(page_info_csv_file_path,encoding='utf-8')
         csv_df=pd.concat([csv_df,df])

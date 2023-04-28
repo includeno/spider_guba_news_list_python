@@ -41,28 +41,30 @@ stock_count=0
 #     except Exception as e:
 #         print(f"get_page_info error! stock:{stock}",e,flush=True)
 #         continue
+from utils import page_info_csv_file_path
+def get_page_info_main(stocks):
+    import concurrent.futures
+    # 创建一个线程池，指定最大线程数为 3
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        futures=[]
+        for stock in li:
+            #去除csv中已经存在的股票代码
+            if(stock in stocks):
+                continue
+            stock_count=stock_count+1
+            if(stock_count>max_count):
+                break
+            try:
+                executor.submit(get_page_info,stock)
+            except Exception as e:
+                print(f"get_page_info error! stock:{stock}",e,flush=True)
+                continue
 
-import concurrent.futures
-# 创建一个线程池，指定最大线程数为 3
-with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-    futures=[]
-    for stock in li:
-        #去除csv中已经存在的股票代码
-        if(stock in stocks):
-            continue
-        stock_count=stock_count+1
-        if(stock_count>max_count):
-            break
-        try:
-            executor.submit(get_page_info,stock)
-        except Exception as e:
-            print(f"get_page_info error! stock:{stock}",e,flush=True)
-            continue
-
-    # 遍历 Future 对象，获取执行结果
-    for future in concurrent.futures.as_completed(futures):
-        try:
-            result = future.result()
-            print(result)
-        except Exception as e:
-            print(f"An error occurred: {e}")
+        # 遍历 Future 对象，获取执行结果
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                result = future.result()
+                print(result)
+            except Exception as e:
+                print(f"An error occurred: {e}")
+    return page_info_csv_file_path

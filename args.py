@@ -30,7 +30,7 @@ args = parser.parse_args()
 with open('DATE', 'w') as f:
     f.write(f'DATE={today()}\n')
 
-from test_requests import main
+from get_all_stock_page_info_concurrent import get_page_info_main
 stocks_df=pd.read_csv(f'divs/stocks_{args.stock}.csv')
 # 定义添加前缀和小写化的函数
 def add_prefix_and_lowercase(text, prefix):
@@ -39,7 +39,7 @@ prefix = 'us'
 # 为某列添加前缀并将原文本小写化
 stocks_df['name_en'] = stocks_df['name_en'].apply(lambda x: add_prefix_and_lowercase(x, prefix))
 stocks=stocks_df['name_en'].tolist()
-page_info_csv_file_path=main(stocks)
+page_info_csv_file_path=get_page_info_main(stocks)
 #file_path=get_table(args.stock,args.max_page)
 
 send_email(args.sender,args.ps,args.recipient,args.smtp_server,args.port,subject='GuBa News',attachment_path_list=[page_info_csv_file_path])
