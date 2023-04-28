@@ -20,6 +20,9 @@ def get_list_url_by_page(stock,page):
 def write_html_request(url,driver=None,html_file=None,implicit_wait=20,page_load_timeout=30,sleep_time=4):
     html = ""
     response = requests.get(url)
+    if(response.status_code!=200):
+        print("response error",response.status_code,flush=True)
+        raise Exception("response error")
     html = response.text
     print(f"get url succeed:{url}",flush=True)
     
@@ -114,7 +117,11 @@ def crawl_stock_list_by_page(stock,page,stock_code):
 
 def get_table_info(stock):
     url=get_list_url_by_page(stock,1)
-    html_file=write_html_request(url,driver=None,html_file=f"html_{stock}.txt",implicit_wait=10,page_load_timeout=35,sleep_time=2)
+    html_file=""
+    try:
+        html_file=write_html(url,driver=None,html_file=f"html_{stock}.txt",implicit_wait=10,page_load_timeout=35,sleep_time=2)
+    except Exception as e:
+        print("get_table_info error",e,flush=True)
     html=""
     # 读取文件
     with open(html_file, 'r', encoding='utf-8') as f:

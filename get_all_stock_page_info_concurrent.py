@@ -59,7 +59,7 @@ def get_page_info_main(stocks):
                 continue
 
         # 遍历 Future 对象，获取执行结果
-        for future in concurrent.futures.as_completed(futures):
+        for future in concurrent.futures.as_completed(futures,timeout=60*60*24*7):
             try:
                 result = future.result()
                 print(result)
