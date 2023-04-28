@@ -6,7 +6,8 @@ import pandas as pd
 import time
 from selenium_driver import get_driver_by_system,get_firefox_driver_options
 import json
-from utils import write_json_data,write_page_csv_data,write_merged_csv_data
+from utils import write_json_data,write_page_csv_data,write_merged_csv_data,write_page_info_csv_data
+import requests
 
 # 测试通过
 def get_list_url_by_page(stock,page):
@@ -15,16 +16,33 @@ def get_list_url_by_page(stock,page):
     else:
         return f"http://guba.eastmoney.com/list,{stock}_"+str(page)+".html"
 
+# 完成
+def write_html_request(url,driver=None,html_file=None,implicit_wait=20,page_load_timeout=30,sleep_time=4):
+    html = ""
+    response = requests.get(url)
+    html = response.text
+    print(f"get url succeed:{url}",flush=True)
+    
+    # 页面源代码写入文件
+    import uuid
+    if(html_file==None):
+        html_file=uuid.uuid4().hex+".txt"
+    with open(html_file, 'w', encoding='utf-8') as f:
+        f.write(html)
+        print(f"write html succeed:{html_file}",flush=True)
+    time.sleep(sleep_time)
+    return html_file
+
 # 测试通过
-def write_html(url,driver=None,html_file="html.txt"):
+def write_html(url,driver=None,html_file=None,implicit_wait=20,page_load_timeout=30,sleep_time=4):
     if(driver==None):
         driver = get_driver_by_system()
     if(driver==None):
         print("driver does not exist",flush=True)
         raise Exception("system driver error")
     # 设置最大等待时间为10秒
-    driver.implicitly_wait(20)
-    driver.set_page_load_timeout(30)
+    driver.implicitly_wait(implicit_wait)
+    driver.set_page_load_timeout(page_load_timeout)
     driver.get(url)
     html = ""
     try:
@@ -38,9 +56,13 @@ def write_html(url,driver=None,html_file="html.txt"):
         html = driver.page_source
         driver.quit()
     # 页面源代码写入文件
+    import uuid
+    if(html_file==None):
+        html_file=uuid.uuid4().hex+".txt"
     with open(html_file, 'w', encoding='utf-8') as f:
         f.write(html)
-    time.sleep(4)
+        print(f"write html succeed:{html_file}",flush=True)
+    time.sleep(sleep_time)
     return html_file
 
 # 测试通过
@@ -60,14 +82,18 @@ def parse_html_js_data(html):
 def crawl_stock_list_by_page(stock,page,stock_code):
     url=get_list_url_by_page(stock,page)
     result=[]
-    html_file=write_html(url,driver=None,html_file="json-temp.txt")
+    filename=f"json_temp_{stock}.txt"
+    html_file=write_html(url,driver=None,html_file=filename)
     html=""
     # 读取文件
     with open(html_file, 'r', encoding='utf-8') as f:
         html = f.read()
     if(html==""):
         print("html is empty",flush=True)
-        
+    # 删除文件
+    import os
+    os.remove(html_file)
+    print(f"html_file:{html_file} removed",flush=True)
     js=parse_html_js_data(html)
     write_json_data(js,f"{stock}_{page}.json")
     for item in js["re"]:
@@ -86,13 +112,12 @@ def crawl_stock_list_by_page(stock,page,stock_code):
     page_csv_file_path=write_page_csv_data(result,stock=stock,page=page)
     return result
 
-def get_table(stock,max_page=1):
-    script='window.scrollTo(0, document.body.scrollHeight);'
+def get_table_info(stock):
     url=get_list_url_by_page(stock,1)
-    temp=write_html(url,driver=None,html_file="html.txt")
+    html_file=write_html_request(url,driver=None,html_file=f"html_{stock}.txt",implicit_wait=10,page_load_timeout=35,sleep_time=2)
     html=""
     # 读取文件
-    with open(temp, 'r', encoding='utf-8') as f:
+    with open(html_file, 'r', encoding='utf-8') as f:
         html = f.read()
     js=parse_html_js_data(html)
     print("bar_name:",js["bar_name"])
@@ -104,6 +129,17 @@ def get_table(stock,max_page=1):
     print("bar_name:",js["bar_name"])
     stock_code=js["bar_info"]["StockCode"]
     print("stock_code:",stock_code)
+
+    # 删除文件
+    import os
+    os.remove(html_file)
+    print(f"html_file:{html_file} removed",flush=True)
+    return count,page_count,stock_code
+
+def get_table(stock,max_page=1,page_count=None,stock_code=None):
+    script='window.scrollTo(0, document.body.scrollHeight);'
+    if(page_count is None or stock_code is None):
+        count,page_count,stock_code=get_table_info(stock)
     
     merged_csv_file_path=""
     result_list=[]
@@ -115,7 +151,7 @@ def get_table(stock,max_page=1):
         try:
             result=crawl_stock_list_by_page(stock,page,stock_code)
         except Exception as e:
-            print("crawl_stock_list_by_page error",e,flush=True)
+            print(f"crawl_stock_list_by_page error ,adding page:{page}",e,flush=True)
             error_pages.append(page)
             time.sleep(10)
             continue
@@ -134,6 +170,13 @@ def get_table(stock,max_page=1):
             result_list.append(data)
         merged_csv_file_path=write_merged_csv_data(result_list,stock=stock)
     return merged_csv_file_path
+
+def get_page_info(stock):
+    print("get_page_info:",stock)
+    count,page_count,stock_code=get_table_info(stock)
+    print("stock:",stock,"count:",count,"page_count:",page_count,"stock_code:",stock_code)
+    write_page_info_csv_data(stock,page_count,count)
+    return count,page_count,stock_code
 
 if __name__ == "__main__":
     print()

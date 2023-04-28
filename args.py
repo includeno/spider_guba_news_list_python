@@ -2,6 +2,7 @@ import argparse
 import datetime
 from spider import get_table
 from mail_sender import send_email
+import pandas as pd
 
 def today():
     today = datetime.datetime.today()
@@ -20,7 +21,7 @@ parser.add_argument('--recipient',required=True, help='输入收件人邮箱')
 parser.add_argument('--smtp_server',required=True, help='输入smtp_server')
 parser.add_argument('--port',required=True, help='输入smtp_server的端口')
 
-parser.add_argument('--stock',required=True, help='输入爬取的stock')
+parser.add_argument('--stock',required=True, help='输入爬取的stock 序号')
 parser.add_argument('--max_page',required=False,default=None, help='输入爬取的最大页数')
 # 解析命令行参数
 args = parser.parse_args()
@@ -29,6 +30,10 @@ args = parser.parse_args()
 with open('DATE', 'w') as f:
     f.write(f'DATE={today()}\n')
 
-file_path=get_table(args.stock,args.max_page)
+from test_requests import main
+df=pd.read_csv(f'divs/stocks_{args.stock}.csv')
+stocks=df['name_en'].tolist()
+page_info_csv_file_path=main(stocks)
+#file_path=get_table(args.stock,args.max_page)
 
-send_email(args.sender,args.ps,args.recipient,args.smtp_server,args.port,subject='GuBa News',attachment_path=file_path)
+send_email(args.sender,args.ps,args.recipient,args.smtp_server,args.port,subject='GuBa News',attachment_path_list=[page_info_csv_file_path])

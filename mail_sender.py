@@ -3,7 +3,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 
-def send_email(sender,password,recipient,smtp_server,port,subject = 'Test Email with Attachment',attachment_path = 'links.csv'):
+def send_email(sender,password,recipient,smtp_server,port,subject = 'Test Email with Attachment',attachment_path_list = ['links.csv']):
     # 设置邮件相关参数
     body = 'Please see the attached file.'
 
@@ -17,11 +17,12 @@ def send_email(sender,password,recipient,smtp_server,port,subject = 'Test Email 
     text = MIMEText(body)
     message.attach(text)
 
-    # 添加附件
-    with open(attachment_path, 'rb') as f:
-        attachment = MIMEApplication(f.read(), _subtype='csv')
-        attachment.add_header('Content-Disposition', 'attachment', filename=f.name)
-        message.attach(attachment)
+    for attachment_path in attachment_path_list:
+        # 添加附件
+        with open(attachment_path, 'rb') as f:
+            attachment = MIMEApplication(f.read(), _subtype='csv')
+            attachment.add_header('Content-Disposition', 'attachment', filename=f.name)
+            message.attach(attachment)
 
     # 发送邮件
     server = smtplib.SMTP(smtp_server, port)
