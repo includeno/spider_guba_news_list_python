@@ -23,7 +23,8 @@ from utils import write_page_info_csv_data,read_page_info_csv_data
 # stocks=df["stock"].values.tolist()
 # print("stocks:",stocks)
 
-max_count=100
+#max_count=100
+max_count=None
 
 # for stock in li:
 #     #去除csv中已经存在的股票代码
@@ -49,7 +50,7 @@ def get_page_info_main(stocks):
         futures=[]
         for stock in stocks:
             stock_count=stock_count+1
-            if(stock_count>max_count):
+            if(max_count is not None and stock_count>max_count):
                 break
             try:
                 executor.submit(get_page_info,stock)
