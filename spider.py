@@ -122,6 +122,7 @@ def get_table_info(stock):
         html_file=write_html(url,driver=None,html_file=f"html_{stock}.txt",implicit_wait=10,page_load_timeout=35,sleep_time=2)
     except Exception as e:
         print("get_table_info error",e,flush=True)
+        raise Exception("get_table_info error")
     html=""
     # 读取文件
     with open(html_file, 'r', encoding='utf-8') as f:
