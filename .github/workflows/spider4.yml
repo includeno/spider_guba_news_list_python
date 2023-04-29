@@ -21,7 +21,7 @@ jobs:
     # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
     strategy:
       matrix:
-        stock: [ "51", "52", "53", "54", "55"] # 0-15
+        stock: [ "74", "75"] # 0-15
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.9
